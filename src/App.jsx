@@ -1,9 +1,10 @@
 import { Box, Grid, Image, GridItem } from "@chakra-ui/react";
 import AddTask from "./components/AddTask";
 import Done from "./components/Done";
-import Tasks from "./components/tasks";
-
+import Tasks from "./components/Tasks";
+import { useState } from "react";
 export default function App() {
+  const [atualizar, setAtualizar] = useState(false);
   return (
     <Box
       color={"#686868"}
@@ -13,6 +14,7 @@ export default function App() {
       display={"flex"}
       flexDirection={"column"}
       alignItems={"center"}
+      fontFamily={"Sen"}
     >
       <Image src="src/assets/tuiduibg.svg" w="12vw" mt="5" />
       <Grid
@@ -25,10 +27,10 @@ export default function App() {
         minW={"80vw"}
       >
         <GridItem rowSpan={2} h={"16rem"}>
-          <AddTask />
+          <AddTask onAdd={() => setAtualizar((prev) => !prev)} />
         </GridItem>
-        <GridItem rowSpan={4}>
-          <Tasks />
+        <GridItem rowSpan={4} w={"40vw"}>
+          <Tasks atualizar={atualizar} />
         </GridItem>
         <GridItem rowSpan={2}>
           <Done />

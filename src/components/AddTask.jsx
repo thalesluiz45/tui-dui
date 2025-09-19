@@ -5,7 +5,6 @@ import {
   HStack,
   Input,
   Select,
-  Stack,
   Portal,
   createListCollection,
   Flex,
@@ -13,7 +12,7 @@ import {
 } from "@chakra-ui/react";
 import { Controller, useForm } from "react-hook-form";
 
-export default function AddTask() {
+export default function AddTask({ onAdd }) {
   const {
     register,
     handleSubmit,
@@ -22,7 +21,17 @@ export default function AddTask() {
   } = useForm();
 
   const onSubmit = async (data) => {
-    /*Alterar para enviar os dados para o back.*/
+    const response = await fetch("http://localhost:8080/api/form", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+
+    if (response.ok) {
+      if (onAdd) onAdd();
+    } else {
+      alert("Erro ao cadastrar tarefa");
+    }
     console.log(data);
   };
 
@@ -32,26 +41,30 @@ export default function AddTask() {
       h={"full"}
       bgColor={"white"}
       overflow={"hidden"}
-      shadow={"sm"}
+      shadow={"0px 2px 6px gray"}
     >
       <form onSubmit={handleSubmit(onSubmit)}>
         <Flex direction="column" p={4} gap={1}>
           <Field.Root invalid={!!errors.tituloDaTarefa}>
-            <Field.Label>Título da tarefa</Field.Label>
+            <Field.Label fontSize={"md"}>Título da tarefa</Field.Label>
             <Input
               {...register("tituloDaTarefa", { required: true })}
               color={"black"}
+              border={"1px solid gray"}
+              rounded={"xl"}
               required
             />
             <Field.ErrorText>{errors.tituloDaTarefa?.message}</Field.ErrorText>
           </Field.Root>
 
           <Field.Root invalid={!!errors.descricaoDaTarefa}>
-            <Field.Label>Descrição da tarefa</Field.Label>
+            <Field.Label fontSize={"md"}>Descrição da tarefa</Field.Label>
             <Textarea
               {...register("descricaoDaTarefa", { required: true })}
               color={"black"}
               resize="none"
+              border={"1px solid gray"}
+              rounded={"xl"}
               required
             />
             <Field.ErrorText>
@@ -59,9 +72,9 @@ export default function AddTask() {
             </Field.ErrorText>
           </Field.Root>
 
-          <HStack align="end">
+          <HStack align="end" gapX={5}>
             <Field.Root invalid={!!errors.prioridade} flex="1">
-              <Field.Label>Prioridade</Field.Label>
+              <Field.Label fontSize={"md"}>Prioridade</Field.Label>
               <Controller
                 control={control}
                 name="prioridade"
@@ -74,14 +87,19 @@ export default function AddTask() {
                     onValueChange={({ value }) => field.onChange(value[0])}
                     onInteractOutside={() => field.onBlur()}
                     collection={prioridades}
+                    highlightedValue
                     required
                   >
                     <Select.HiddenSelect />
                     <Select.Control>
-                      <Select.Trigger>
+                      <Select.Trigger
+                        border={"1px solid gray"}
+                        rounded={"xl"}
+                        cursor={"pointer"}
+                      >
                         <Select.ValueText
                           placeholder="Selecione"
-                          color={"black"}
+                          color={"gray"}
                         />
                       </Select.Trigger>
                       <Select.IndicatorGroup>
@@ -91,14 +109,16 @@ export default function AddTask() {
                     <Portal>
                       <Select.Positioner>
                         <Select.Content
-                          colorPalette={"red"}
+                          rounded={"xl"}
                           bgColor={"white"}
                           color={"black"}
                         >
                           {prioridades.items.map((prioridade) => (
                             <Select.Item
                               item={prioridade}
-                              key={prioridade.value}
+                              key={parseInt(prioridade.value)}
+                              _hover={{ bg: "#609398" }}
+                              rounded={"md"}
                             >
                               {prioridade.label}
                               <Select.ItemIndicator />
@@ -112,7 +132,15 @@ export default function AddTask() {
               />
               <Field.ErrorText>{errors.prioridades?.message}</Field.ErrorText>
             </Field.Root>
-            <Button type="submit" colorPalette={"teal"} flexShrink={0}>
+            <Button
+              type="submit"
+              rounded={"xl"}
+              bgColor={"#609398"}
+              color={"white"}
+              flexShrink={0}
+              w={"10vw"}
+              fontSize={"lg"}
+            >
               Adicionar
             </Button>
           </HStack>
@@ -123,8 +151,8 @@ export default function AddTask() {
 }
 const prioridades = createListCollection({
   items: [
-    { label: "Pra ontem", value: 1 },
-    { label: "Quando der", value: 2 },
-    { label: "Sem pressa", value: 3 },
+    { label: "🔴 Pra ontem", value: "1" },
+    { label: "🟡 Quando der", value: "2" },
+    { label: "🟢 Sem pressa", value: "3" },
   ],
 });
