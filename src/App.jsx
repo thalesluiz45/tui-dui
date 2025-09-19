@@ -2,6 +2,7 @@ import { Box, Grid, Image, GridItem } from "@chakra-ui/react";
 import AddTask from "./components/AddTask";
 import Done from "./components/Done";
 import Tasks from "./components/Tasks";
+import { Toaster } from "@/components/ui/toaster";
 import { useState } from "react";
 export default function App() {
   const [atualizar, setAtualizar] = useState(false);
@@ -17,6 +18,7 @@ export default function App() {
       fontFamily={"Sen"}
     >
       <Image src="src/assets/tuiduibg.svg" w="12vw" mt="5" />
+      <Toaster color="red" />
       <Grid
         templateRows="repeat(4, 1fr)"
         templateColumns="repeat(2, 1fr)"

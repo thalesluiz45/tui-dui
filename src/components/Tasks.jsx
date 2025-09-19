@@ -4,7 +4,6 @@ import {
   Heading,
   Collapsible,
   ScrollArea,
-  Stack,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 
