@@ -4,6 +4,10 @@ import Done from "./components/Done";
 import Tasks from "./components/Tasks";
 import { Toaster } from "@/components/ui/toaster";
 import { useState } from "react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
+const queryClient = new QueryClient();
+
 export default function App() {
   const [atualizar, setAtualizar] = useState(false);
   return (
@@ -28,15 +32,17 @@ export default function App() {
         h="70vh"
         minW={"80vw"}
       >
-        <GridItem rowSpan={2} h={"16rem"}>
-          <AddTask onAdd={() => setAtualizar((prev) => !prev)} />
-        </GridItem>
-        <GridItem rowSpan={4} w={"40vw"}>
-          <Tasks atualizar={atualizar} />
-        </GridItem>
-        <GridItem rowSpan={2}>
-          <Done />
-        </GridItem>
+        <QueryClientProvider client={queryClient}>
+          <GridItem rowSpan={2} h={"16rem"}>
+            <AddTask />
+          </GridItem>
+          <GridItem rowSpan={4} w={"40vw"}>
+            <Tasks />
+          </GridItem>
+          <GridItem rowSpan={2}>
+            <Done />
+          </GridItem>
+        </QueryClientProvider>
       </Grid>
     </Box>
   );

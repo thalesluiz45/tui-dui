@@ -5,21 +5,25 @@ import {
   Collapsible,
   ScrollArea,
 } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
 
-export default function Tasks({ atualizar }) {
-  const [dados, setDados] = useState([]);
+import { useQuery } from "@tanstack/react-query";
 
-  const fetchDados = () => {
-    fetch("http://localhost:8080/api/form")
-      .then((res) => res.json())
-      .then((data) => setDados(data))
-      .catch(console.error);
-  };
+const fetchTarefas = async () => {
+  const res = await fetch("http://localhost:8080/api/form");
+  return res.json();
+};
+export default function Tasks() {
+  const {
+    data: dados = [],
+    isLoading,
+    isError,
+  } = useQuery({
+    queryKey: ["tarefas"],
+    queryFn: fetchTarefas,
+  });
 
-  useEffect(() => {
-    fetchDados();
-  }, [atualizar]);
+  if (isLoading) return <Box>Carregando...</Box>;
+  if (isError) return <Box>Erro ao carregar tarefas</Box>;
 
   return (
     <Box

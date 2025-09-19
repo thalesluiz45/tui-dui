@@ -4,7 +4,9 @@ import TitleTaskForm from "./TaskForm/TitleTaskForm";
 import DescriptionTaskForm from "./TaskForm/DescriptionTaskForm";
 import SelecTaskForm from "./TaskForm/SelectTaskForm";
 import { toaster } from "./ui/toaster";
-export default function AddTask({ onAdd }) {
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+
+export default function AddTask() {
   const {
     register,
     handleSubmit,
@@ -12,30 +14,37 @@ export default function AddTask({ onAdd }) {
     control,
   } = useForm();
 
-  const onSubmit = async (data) => {
-    const response = await fetch("http://localhost:8080/api/form", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
-    });
+  const queryClient = useQueryClient();
 
-    if (response.ok) {
-      if (onAdd) {
-        onAdd();
-        toaster.success({
-          description: "Tarefa adicionada com sucesso.",
-          duration: 2000,
-          closable: true,
-        });
-      }
-    } else {
+  const addTarefaMutation = useMutation({
+    mutationFn: async (data) => {
+      const response = await fetch("http://localhost:8080/api/form", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      return response.json();
+    },
+    onSuccess: () => {
+      toaster.success({
+        description: "Tarefa adicionada com sucesso.",
+        duration: 2000,
+        closable: true,
+      });
+
+      queryClient.invalidateQueries({ queryKey: ["tarefas"] });
+    },
+    onError: () => {
       toaster.error({
         description: "Erro ao adicionar tarefa.",
         duration: 2000,
         closable: true,
       });
-    }
-    console.log(data);
+    },
+  });
+
+  const onSubmit = (data) => {
+    addTarefaMutation.mutate(data);
   };
 
   return (
@@ -66,6 +75,7 @@ export default function AddTask({ onAdd }) {
               flexShrink={0}
               w={"10vw"}
               fontSize={"lg"}
+              isLoading={addTarefaMutation.isPending}
             >
               Adicionar
             </Button>
